@@ -63,9 +63,8 @@ public view returns (uint balance) {
 function transfer(address _to, uint _amount)
 public returns (bool success) {
 	// withdraw from caller
-	uint balance = balances[msg.sender];
-	require(_amount <= balance, "insufficient funds");
-	balances[msg.sender] -= balance - _amount;
+	require(_amount <= balances[msg.sender], "insufficient funds");
+	balances[msg.sender] -= _amount;
 
 	// ammend to addressee
 	balances[_to] += _amount;
@@ -90,16 +89,14 @@ public returns (bool success) {
 function transferFrom(address _from, address _to, uint _amount)
 public returns (bool success) {
 	// need allowance for caller
-	uint allowance = allowances[_from][msg.sender];
-	require(_amount <= allowance, "insufficient allowance");
+	require(_amount <= allowances[_from][msg.sender], "insufficient allowance");
 
 	// check available tokens
-	uint balance = balances[_from];
-	require(_amount <= balance, "insufficient funds");
+	require(_amount <= balances[_from], "insufficient funds");
 
 	// deduct allowance with withdrawal
-	allowances[_from][msg.sender] = allowance - _amount;
-	balances[_from] = balance - _amount;
+	allowances[_from][msg.sender] -= _amount;
+	balances[_from] -= _amount;
 
 	// ammend to addressee
 	balances[_to] += _amount;
